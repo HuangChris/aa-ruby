@@ -1,4 +1,5 @@
 class Piece
+
   attr_accessor :board
   attr_reader   :color
 
@@ -38,11 +39,29 @@ class Pawn < Piece
     super("Pawn", color)
   end
 
+  def moves(start_pos)
+    movelist = []
+    if color == :black
+      #blak is broken right now
+      movelist << [start_pos[0] + 1, start_pos[1]]
+      movelist << [start_pos[0] + 2, start_pos[1]] if start_pos[0] == 1
+      attack_move_1 = [start_pos[0] + 1, start_pos[1] + 1]
+      attack_move_2 = [start_pos[0] + 1, start_pos[1] - 1]
+      # movelist << attack_move_1
+      #if a piece diagonally forward of it
+      #movelist << diagonally
+
+    else
+      movelist << [start_pos[0] - 1, start_pos[1]]
+      movelist << [start_pos[0] - 2, start_pos[1]] if start_pos[0] == 6
+    end
+  end
+
   def to_s
     if self.color == :black
-      " ♟ "
+      "♟ "
     else
-      " ♙ "
+      "♙ "
     end
   end
 end

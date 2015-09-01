@@ -18,8 +18,8 @@ class Board
       6.times do |j|
         self[[j+1,idx]] = NullPiece.new("nil", "nil")
       end
-      # self[[1,idx]] = Pawn.new(:black)
-      # self[[6,idx]] = Pawn.new(:white)
+      self[[1,idx]] = Pawn.new(:black)
+      self[[6,idx]] = Pawn.new(:white)
     end
 
     2.times { |i| self[[7,7*i]] = Rook.new(:white) }
@@ -55,14 +55,14 @@ class Board
 
   def valid_move?(start_pos,end_pos, player)
     piece = self[start_pos]
-      raise WrongColor if piece.color != player.color
-      raise InvalidMove unless piece.moves(start_pos).include?(end_pos)
-      raise InvalidMove if self[start_pos].color == self[end_pos].color
-      raise InCheck if start_pos == end_pos
+    raise WrongColor if piece.color != player.color
+    raise InvalidMove unless piece.moves(start_pos).include?(end_pos)
+    raise InvalidMove if self[start_pos].color == self[end_pos].color
+    raise InCheck if start_pos == end_pos
     #can't move if you are in check after move
-      #use move, call #in_check?, reset move
-      #raise InCheck
-      true
+    #use move, call #in_check?, reset move
+    #raise InCheck
+    true
 
   end
 
