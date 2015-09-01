@@ -40,10 +40,11 @@ class Display
 
   end
 
-  def render(selected_pos)
+  def render(selected_pos,player, error = nil)
     system("clear")
-    puts "Fill the grid!"
+    puts "It's #{player.color.to_s}'s turn"
     puts "Arrow keys, WASD, or vim to move, space or enter to confirm."
     build_grid(selected_pos).each { |row| puts row.join }
+    puts error.message unless error.nil?
   end
 end

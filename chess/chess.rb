@@ -11,26 +11,23 @@ class Chess
   end
 
   def play
-
+    players.first.render_board(nil)
     until board.game_over?
-      # begin
-      players.first.render_board(nil)
+      begin
       start_pos, end_pos = get_turn
       board.move_piece(start_pos, end_pos, players.first)
+      players.first.render_board(nil)
       players.rotate!
-      # rescue WrongColor
-      #   puts "that's not your piece"
-      #   retry
-      # rescue EmptySquare
-      #   puts "select an actual piece"
-      #   retry
-      # rescue InvalidMove
-      #   puts "you can't move there"
-      #   retry
-      # rescue InCheck
-      #   puts "You can't make that move, as you would be in check"
-      #   retry
-      # end
+      rescue WrongColor => error
+        players.first.render_board(nil,error)
+        retry
+      rescue InvalidMove => error
+        players.first.render_board(nil,error)
+        retry
+      rescue InCheck => error
+        players.first.render_board(nil,error)
+        retry
+      end
     end
   end
 
@@ -38,8 +35,8 @@ class Chess
     start_pos = nil
     end_pos = nil
     while start_pos.nil?
-      players.first.render_board(nil)
       start_pos = players.first.display.get_input
+      players.first.render_board(start_pos)
     end
     while end_pos.nil?
       players.first.render_board(start_pos)

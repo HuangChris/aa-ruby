@@ -11,8 +11,8 @@ class Player
     @color = color
   end
 
-  def render_board(pos)
-    @display.render(pos)
+  def render_board(pos,error = nil)
+    @display.render(pos,self,error)
   end
 
 

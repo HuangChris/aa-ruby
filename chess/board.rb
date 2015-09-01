@@ -55,18 +55,15 @@ class Board
 
   def valid_move?(start_pos,end_pos, player)
     piece = self[start_pos]
-    if piece.color != player.color
-      raise WrongColor
-    elsif piece.class == NullPiece
-      raise EmptySquare
-    elsif !piece.moves(start_pos).include?(end_pos)
-      raise InvalidMove
+      raise WrongColor if piece.color != player.color
+      raise InvalidMove unless piece.moves(start_pos).include?(end_pos)
+      raise InvalidMove if self[start_pos].color == self[end_pos].color
+      raise InCheck if start_pos == end_pos
     #can't move if you are in check after move
       #use move, call #in_check?, reset move
       #raise InCheck
-    else
       true
-    end
+
   end
 
   def[](pos)
@@ -99,13 +96,19 @@ end
 #   end
 # end
 class WrongColor < StandardError
+  def message
+    "You can't move that piece"
+  end
 end
 
 class InvalidMove < StandardError
-end
-
-class EmptySquare < StandardError
+  def message
+    "You can't move there"
+  end
 end
 
 class InCheck < StandardError
+  def message
+    "You would be in check after that move"
+  end
 end
