@@ -20,6 +20,10 @@ class Piece
       #move is not to a spot off the grid
     end
   end
+
+  def occupied?
+    true
+  end
 end
 
 
@@ -30,6 +34,10 @@ class NullPiece < Piece
 
   def moves(_)
     []
+  end
+
+  def occupied?
+    false
   end
 
 end
@@ -86,10 +94,15 @@ class SlidePiece < Piece
     movelist = []
     move_diff.each do |diff|
       7.times do |idx|
-        movelist << [start_pos[0] + (idx + 1) * diff[0], start_pos[1] + (idx + 1) * diff[1]]
+        pos = [start_pos[0] + (idx + 1) * diff[0], start_pos[1] + (idx + 1) * diff[1]]
+        # p pos
+        # p @board
+        # #we need to break the loop once it hits an occupied space.
+        # break if @board[pos].nil? || @board[pos].occupied?
+        movelist << pos
       end
     end
-    movelist = super(movelist)
+    # movelist = super(movelist)
     p movelist
     movelist
   end
