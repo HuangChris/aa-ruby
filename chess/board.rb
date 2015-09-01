@@ -1,9 +1,7 @@
 require_relative 'pieces'
 require_relative 'display'
 
-
 class Board
-
   attr_accessor :cursor_pos
   attr_reader :grid
 
@@ -29,7 +27,13 @@ class Board
 
   end
 
+
   def populate
+    piece_lineup = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+    piece_lineup.each_with_index do |piece, idx|
+      self[[0,idx]] = piece.new(:black, self)
+      self[[7,idx]] = piece.new(:white, self)
+    end
     #creates tiles for pieces, assigns them to grid
     8.times do |idx|
       6.times do |j|
@@ -38,22 +42,6 @@ class Board
       self[[1,idx]] = Pawn.new(:black, self)
       self[[6,idx]] = Pawn.new(:white, self)
     end
-
-    2.times { |i| self[[7,7*i]] = Rook.new(:white, self) }
-    2.times { |i| self[[0,7*i]] = Rook.new(:black, self) }
-
-    2.times { |i| self[[7,5*i+1]] = Knight.new(:white, self) }
-    2.times { |i| self[[0,5*i+1]] = Knight.new(:black, self) }
-
-    2.times { |i| self[[7,3*i+2]] = Bishop.new(:white, self) }
-    2.times { |i| self[[0,3*i+2]] = Bishop.new(:black, self) }
-
-    self[[0,4]] = King.new(:black, self)
-    self[[7,4]] = King.new(:white, self)
-    self[[0,3]] = Queen.new(:black, self)
-    self[[7,3]] = Queen.new(:white, self)
-
-    # grid.flatten.each { |piece| piece.board = self }
   end
 
   def dup
@@ -63,6 +51,7 @@ class Board
         duped[[ridx,pidx]] = self[[ridx,pidx]].dup(duped)
       end
     end
+
     duped
   end
 
@@ -72,22 +61,17 @@ class Board
       self[start_pos], self[end_pos] = NullPiece.new(nil, self), self[start_pos]
     end
 
-    promote_pawns
+    promote_pawns(:white)
+    promote_pawns(:black)
     #if pawn on last row, replace pawn with queen
   end
 
-  def promote_pawns
-    grid[0].each_with_index do |piece,idx|
-      if piece.class == Pawn && piece.color == :white
-        self[[0,idx]] = Queen.new(:white, self)
-        self[[0,idx]].board = self
-      end
-    end
+  def promote_pawns(color)
+    color == :black ? (goal = 7) : (goal = 0)
 
-    grid[7].each_with_index do |piece,idx|
-      if piece.class == Pawn && piece.color == :black
-        self[[7,idx]] = Queen.new(:black, self)
-        self[[7,idx]].board = self
+    grid[goal].each_with_index do |piece, idx|
+      if piece.class == Pawn && piece.color == color
+        self[[goal, idx]] = Queen.new(color, self)
       end
     end
   end
@@ -104,13 +88,8 @@ class Board
   end
 
   def in_check?(color)
-
     king_pos = find_king(color)
-    if color == :black
-      other_color = :white
-    else
-      other_color = :black
-    end
+    other_color = (color == :black ? :white : :black)
 
     get_pieces(other_color).each do |pos, piece|
       if piece.color != color && piece.class != NullPiece
@@ -139,7 +118,7 @@ class Board
       piece.moves(pos).any? do |move|
         begin
           valid_move?(pos, move, color)
-        rescue
+        rescue WrongColor, InvalidMove, InCheck
           false
         end
         #rescue block for invalid move errors
@@ -164,7 +143,8 @@ class Board
   def move!(start_pos, end_pos)
     # puts "#{start_pos} move to #{end_pos}" TODO add to render (show last move)
     self[start_pos], self[end_pos] = NullPiece.new(nil, self), self[start_pos]
-    promote_pawns
+    promote_pawns(:white)
+    promote_pawns(:black)
   end
 
   def valid_move?(start_pos,end_pos, color)

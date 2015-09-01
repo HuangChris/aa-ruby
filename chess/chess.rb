@@ -11,21 +11,17 @@ class Chess
   end
 
   def play
+    # debugger
     players.first.render_board(nil)
     until board.game_over?(players.first.color)
+
       # TODO everytime we rotate, set a color variable to pass
       begin
       start_pos, end_pos = get_turn
       board.move_piece(start_pos, end_pos, players.first.color)
       players.rotate!
       players.first.render_board(nil)
-      rescue WrongColor => error
-        players.first.render_board(nil,error)
-        retry
-      rescue InvalidMove => error
-        players.first.render_board(nil,error)
-        retry
-      rescue InCheck => error
+      rescue WrongColor, InvalidMove, InCheck => error
         players.first.render_board(nil,error)
         retry
       end
@@ -36,7 +32,9 @@ class Chess
   end
 
   def game_over_message
-    puts "Game over!  #{players.last.color.capitalize} wins!"
+    puts "Game over!"
+    puts "#{players.last.color.capitalize} wins!" if board.checkmate?
+
   end
 
   def get_turn
