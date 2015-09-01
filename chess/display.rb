@@ -30,7 +30,7 @@ class Display
     elsif (i + j).odd?
       bg = :light_blue
     else
-      bg = :blue
+      bg = :light_green
     end
     if @board[[i,j]].color == :white
       { background: bg, color: :white }
@@ -42,7 +42,8 @@ class Display
 
   def render(selected_pos,player, error = nil)
     system("clear")
-    puts "It's #{player.color.to_s}'s turn"
+    puts "It's #{player.color.to_s.capitalize}'s turn"
+    puts "#{player.color.to_s.capitalize} is in check!" if @board.in_check?(player.color)
     puts "Arrow keys, WASD, or vim to move, space or enter to confirm."
     build_grid(selected_pos).each { |row| puts row.join }
     puts error.message unless error.nil?

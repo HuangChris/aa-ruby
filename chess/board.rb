@@ -8,57 +8,174 @@ class Board
   attr_reader :grid
 
   def initialize
-    @grid = Array.new(8) {Array.new}
-    populate
+    @grid = Array.new(8) {Array.new(8)}
+     populate
+    # populate_test
+  end
+
+  def populate_test
+    # debugger
+    grid.each_with_index do |row,ridx|
+      row.each_with_index do |_,cidx|
+        self[[ridx,cidx]] = NullPiece.new(nil, self)
+      end
+    end
+    self[[1,5]] = Pawn.new(:white, self)
+    # self[[5,7]] = King.new(:black, self)
+    self[[1,3]] = Pawn.new(:black, self)
+    # grid.flatten.each { |piece| piece.board = self }
+    #TODO: initialize pieces with the board, instead of adding after.
+
+
   end
 
   def populate
     #creates tiles for pieces, assigns them to grid
     8.times do |idx|
       6.times do |j|
-        self[[j+1,idx]] = NullPiece.new("nil", "nil")
+        self[[j+1,idx]] = NullPiece.new(nil, self)
       end
-      self[[1,idx]] = Pawn.new(:black)
-      self[[6,idx]] = Pawn.new(:white)
+      self[[1,idx]] = Pawn.new(:black, self)
+      self[[6,idx]] = Pawn.new(:white, self)
     end
 
-    2.times { |i| self[[7,7*i]] = Rook.new(:white) }
-    2.times { |i| self[[0,7*i]] = Rook.new(:black) }
+    2.times { |i| self[[7,7*i]] = Rook.new(:white, self) }
+    2.times { |i| self[[0,7*i]] = Rook.new(:black, self) }
 
-    2.times { |i| self[[7,5*i+1]] = Knight.new(:white) }
-    2.times { |i| self[[0,5*i+1]] = Knight.new(:black) }
+    2.times { |i| self[[7,5*i+1]] = Knight.new(:white, self) }
+    2.times { |i| self[[0,5*i+1]] = Knight.new(:black, self) }
 
-    2.times { |i| self[[7,3*i+2]] = Bishop.new(:white) }
-    2.times { |i| self[[0,3*i+2]] = Bishop.new(:black) }
+    2.times { |i| self[[7,3*i+2]] = Bishop.new(:white, self) }
+    2.times { |i| self[[0,3*i+2]] = Bishop.new(:black, self) }
 
-    self[[0,4]] = King.new(:black)
-    self[[7,4]] = King.new(:white)
-    self[[0,3]] = Queen.new(:black)
-    self[[7,3]] = Queen.new(:white)
+    self[[0,4]] = King.new(:black, self)
+    self[[7,4]] = King.new(:white, self)
+    self[[0,3]] = Queen.new(:black, self)
+    self[[7,3]] = Queen.new(:white, self)
 
-    grid.flatten.each do |piece|
-      piece.board = self
+    # grid.flatten.each { |piece| piece.board = self }
+  end
+
+  def dup
+    duped = Board.new
+    grid.each_with_index do |row, ridx|
+      row.each_with_index do |piece, pidx|
+        duped[[ridx,pidx]] = self[[ridx,pidx]].dup(duped)
+      end
+    end
+    duped
+  end
+
+  def move_piece(start_pos, end_pos, color)
+    if valid_move?(start_pos,end_pos, color)
+      # puts "#{start_pos} move to #{end_pos}" TODO see below (move!)
+      self[start_pos], self[end_pos] = NullPiece.new(nil, self), self[start_pos]
+    end
+
+    promote_pawns
+    #if pawn on last row, replace pawn with queen
+  end
+
+  def promote_pawns
+    grid[0].each_with_index do |piece,idx|
+      if piece.class == Pawn && piece.color == :white
+        self[[0,idx]] = Queen.new(:white, self)
+        self[[0,idx]].board = self
+      end
+    end
+
+    grid[7].each_with_index do |piece,idx|
+      if piece.class == Pawn && piece.color == :black
+        self[[7,idx]] = Queen.new(:black, self)
+        self[[7,idx]].board = self
+      end
     end
   end
 
-  def move_piece(start_pos, end_pos, player)
-    if valid_move?(start_pos,end_pos, player)
-      puts "#{start_pos} move to #{end_pos}"
-      self[start_pos], self[end_pos] = NullPiece.new("nil", "nil"), self[start_pos]
+  def find_king(color)
+    grid.each_with_index do |row, ridx|
+      row.each_with_index do |square, sidx|
+        if square.color == color && square.class == King
+          return [ridx, sidx]
+        end
+      end
     end
-
+    raise "what? no #{color} king!"
   end
 
   def in_check?(color)
+
+    king_pos = find_king(color)
+    if color == :black
+      other_color = :white
+    else
+      other_color = :black
+    end
+
+    get_pieces(other_color).each do |pos, piece|
+      if piece.color != color && piece.class != NullPiece
+        return true if piece.moves(pos).include?(king_pos)
+      end
+    end
+    false
+    #find king
+    #
     #return true if any piece of opposite color has the king as a valid move
   end
 
-  def valid_move?(start_pos,end_pos, player)
+  def get_pieces(color)
+    pieces = Hash.new
+    grid.each_with_index do |row,ridx|
+      row.each_with_index do |piece, pidx|
+        pieces[[ridx,pidx]] = piece if piece.color == color
+      end
+    end
+    pieces
+
+  end
+
+  def no_valid_moves?(color)
+    get_pieces(color).none? do |pos, piece|
+      piece.moves(pos).any? do |move|
+        begin
+          valid_move?(pos, move, color)
+        rescue
+          false
+        end
+        #rescue block for invalid move errors
+      end
+    end
+  end
+
+  def check_mate?(color)
+    no_valid_moves?(color) if in_check?(color)
+
+    # puts "checkmate? #{var}"
+    # var
+  end
+
+  def stale_mate?(color)
+    no_valid_moves?(:white) && no_valid_moves?(:black)
+    #no valid moves except king for both players
+
+
+  end
+
+  def move!(start_pos, end_pos)
+    # puts "#{start_pos} move to #{end_pos}" TODO add to render (show last move)
+    self[start_pos], self[end_pos] = NullPiece.new(nil, self), self[start_pos]
+    promote_pawns
+  end
+
+  def valid_move?(start_pos,end_pos, color)
     piece = self[start_pos]
-    raise WrongColor if piece.color != player.color
+    raise WrongColor if piece.color != color
     raise InvalidMove unless piece.moves(start_pos).include?(end_pos)
     raise InvalidMove if self[start_pos].color == self[end_pos].color
-    raise InCheck if start_pos == end_pos
+    test_board = self.dup
+    test_board.move!(start_pos, end_pos)
+    raise InCheck if test_board.in_check?(color)
+
     #can't move if you are in check after move
     #use move, call #in_check?, reset move
     #raise InCheck
@@ -79,22 +196,11 @@ class Board
     pos.all? {|position| position.between?(0,7)}
   end
 
-  def game_over?
-    false
-    # TODO
+  def game_over?(color)
+    check_mate?(color) || stale_mate?(color)
   end
 end
 
-# if __FILE__ == $PROGRAM_NAME
-#
-# a = Board.new
-# b = Display.new(a)
-#
-#   loop do
-#     b.render
-#     b.get_input
-#   end
-# end
 class WrongColor < StandardError
   def message
     "You can't move that piece"

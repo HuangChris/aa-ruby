@@ -12,12 +12,13 @@ class Chess
 
   def play
     players.first.render_board(nil)
-    until board.game_over?
+    until board.game_over?(players.first.color)
+      # TODO everytime we rotate, set a color variable to pass
       begin
       start_pos, end_pos = get_turn
-      board.move_piece(start_pos, end_pos, players.first)
-      players.first.render_board(nil)
+      board.move_piece(start_pos, end_pos, players.first.color)
       players.rotate!
+      players.first.render_board(nil)
       rescue WrongColor => error
         players.first.render_board(nil,error)
         retry
@@ -29,6 +30,13 @@ class Chess
         retry
       end
     end
+
+    game_over_message
+
+  end
+
+  def game_over_message
+    puts "Game over!  #{players.last.color.capitalize} wins!"
   end
 
   def get_turn
