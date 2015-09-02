@@ -36,7 +36,7 @@ class PokerGame
   def deal_deck
     5.times do
       @players.each do |player|
-        player.get_cards(@deck.deal_card)
+        player.get_cards([@deck.deal_card])
       end
     end
   end

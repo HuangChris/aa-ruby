@@ -11,7 +11,7 @@ class Hand
     #add card to @cards if it's not full
   end
 
-  def give_card(card_index)
+  def drop_card(card_index)
     #remove cards from @cards
   end
 
