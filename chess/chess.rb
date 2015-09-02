@@ -41,7 +41,7 @@ class Chess
       color = players.first.color
 
       players.first.render_board(nil)
-      rescue WrongColor, InvalidMove, InCheck => error
+      rescue WrongColor, InvalidMove, InCheck, MissingKing => error
         players.first.render_board(nil,error)
         retry
       end

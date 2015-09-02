@@ -17,9 +17,9 @@ class Board
         self[[ridx,cidx]] = NullPiece.new(nil, self)
       end
     end
-    self[[1,5]] = Pawn.new(:white, self)
-    self[[5,7]] = King.new(:black, self)
-    self[[1,3]] = King.new(:white, self)
+    self[[1,3]] = Queen.new(:white, self)
+    self[[0,0]] = King.new(:black, self)
+    self[[0,2]] = King.new(:white, self)
   end
 
   def populate
@@ -81,23 +81,27 @@ class Board
         end
       end
     end
-    p grid
-    raise "what? no #{color} king!"
+    grid.each do |row|
+      row.each do |tile|
+        print tile.to_s
+      end
+      puts ""
+    end
+    raise MissingKing
   end
 
   def in_check?(color)
+    # debugger
+
     king_pos = find_king(color)
     other_color = (color == :black ? :white : :black)
 
-    get_pieces(other_color).each do |pos, piece|
-      if piece.color != color && piece.class != NullPiece
-        return true if piece.moves(pos, false).include?(king_pos)
-      end
+    get_pieces(other_color).any? do |pos, piece|
+      # if piece.color != color && piece.class != NullPiece #do we need this if?
+        piece.moves(pos, false).include?(king_pos)
+      # end
     end
-    false
-    #find king
-    #
-    #return true if any piece of opposite color has the king as a valid move
+
   end
 
   def get_pieces(color)
@@ -118,7 +122,7 @@ class Board
   end
 
   def check_mate?(color)
-    no_valid_moves?(color) if in_check?(color)
+    in_check?(color) && no_valid_moves?(color)
 
     # puts "checkmate? #{var}"
     # var
@@ -141,7 +145,7 @@ class Board
   def valid_move?(start_pos, end_pos, color)
     piece = self[start_pos]
     raise WrongColor if piece.color != color
-    raise InvalidMove unless piece.moves(start_pos,false).include?(end_pos)
+    raise InvalidMove unless piece.moves(start_pos,true).include?(end_pos)
     raise InvalidMove if self[start_pos].color == self[end_pos].color
     test_board = self.dup
     test_board.move!(start_pos, end_pos)
@@ -183,5 +187,11 @@ end
 class InCheck < StandardError
   def message
     "You would be in check after that move"
+  end
+end
+
+class MissingKing < StandardError
+  def message
+    "I lost a king somewhere... let me try again.  If I get stuck, Ctrl-C to quit"
   end
 end
