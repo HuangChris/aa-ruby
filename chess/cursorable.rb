@@ -31,7 +31,7 @@ module Cursorable
     down: [1, 0]
   }
 
-  def get_input
+  def get_input(_)
     key = KEYMAP[read_char]
     handle_key(key)
   end

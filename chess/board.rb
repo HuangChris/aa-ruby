@@ -12,21 +12,15 @@ class Board
   end
 
   def populate_test
-    # debugger
     grid.each_with_index do |row,ridx|
       row.each_with_index do |_,cidx|
         self[[ridx,cidx]] = NullPiece.new(nil, self)
       end
     end
     self[[1,5]] = Pawn.new(:white, self)
-    # self[[5,7]] = King.new(:black, self)
-    self[[1,3]] = Pawn.new(:black, self)
-    # grid.flatten.each { |piece| piece.board = self }
-    #TODO: initialize pieces with the board, instead of adding after.
-
-
+    self[[5,7]] = King.new(:black, self)
+    self[[1,3]] = King.new(:white, self)
   end
-
 
   def populate
     piece_lineup = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
@@ -93,7 +87,7 @@ class Board
 
     get_pieces(other_color).each do |pos, piece|
       if piece.color != color && piece.class != NullPiece
-        return true if piece.moves(pos).include?(king_pos)
+        return true if piece.moves(pos, false).include?(king_pos)
       end
     end
     false
@@ -115,14 +109,7 @@ class Board
 
   def no_valid_moves?(color)
     get_pieces(color).none? do |pos, piece|
-      piece.moves(pos).any? do |move|
-        begin
-          valid_move?(pos, move, color)
-        rescue WrongColor, InvalidMove, InCheck
-          false
-        end
-        #rescue block for invalid move errors
-      end
+      piece.moves(pos,true).length > 0
     end
   end
 
@@ -147,20 +134,16 @@ class Board
     promote_pawns(:black)
   end
 
-  def valid_move?(start_pos,end_pos, color)
+  def valid_move?(start_pos, end_pos, color)
     piece = self[start_pos]
     raise WrongColor if piece.color != color
-    raise InvalidMove unless piece.moves(start_pos).include?(end_pos)
+    raise InvalidMove unless piece.moves(start_pos,false).include?(end_pos)
     raise InvalidMove if self[start_pos].color == self[end_pos].color
     test_board = self.dup
     test_board.move!(start_pos, end_pos)
     raise InCheck if test_board.in_check?(color)
 
-    #can't move if you are in check after move
-    #use move, call #in_check?, reset move
-    #raise InCheck
     true
-
   end
 
   def[](pos)
