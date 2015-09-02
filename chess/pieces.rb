@@ -6,13 +6,6 @@ class Piece
     @type, @board, @color  = piece_type, board, color
   end
 
-  # def moves(movelist)
-  #   # movelist.select do |move|
-  #   #   move[0].between?(0,7) && move[1].between?(0,7)
-  #   #   #move is not to a spot off the grid
-  #   # end
-  # end
-
   def valid_move?(start_pos, end_pos, flag)
     return false unless @board.in_bounds?(end_pos)
     return false if @board[start_pos].color == @board[end_pos].color

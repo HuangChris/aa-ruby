@@ -46,6 +46,7 @@ class Display
     puts "It's #{player.color.to_s.capitalize}'s turn"
     puts "#{player.color.to_s.capitalize} is in check!" if @board.in_check?(player.color)
     puts "It's a stalemate" if @board.get_pieces(:white).length == 1 && @board.get_pieces(:black).length == 1
+    #for fun with comp v comp, this stalemate condition doesn't quit the game yet.
     puts "Arrow keys, WASD, or vim to move, space or enter to confirm."
     build_grid(selected_pos).each { |row| puts row.join }
     puts error.message unless error.nil?

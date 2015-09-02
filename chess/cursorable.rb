@@ -62,7 +62,6 @@ module Cursorable
   ensure
     STDIN.echo = true
     STDIN.cooked!
-
     return input
   end
 

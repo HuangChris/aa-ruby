@@ -26,7 +26,7 @@ class ComputerPlayer < Player
   end
 
   def get_input(start_pos)
-    #  sleep(0.15)
+     sleep(0.15)
     # _ = gets.chomp
     if start_pos.nil? #first part of move (return start_pos)
       computers_move_list = Hash.new

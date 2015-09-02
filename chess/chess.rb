@@ -8,6 +8,7 @@ class Chess
   def initialize
     mode = get_game_mode
     @board   = Board.new
+    #this should be split out, probably.
     case mode
     when 1
       @players = [Player.new("1", @board, :white), Player.new("2", @board, :black)]

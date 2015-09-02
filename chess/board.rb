@@ -12,6 +12,7 @@ class Board
   end
 
   def populate_test
+    #test board with fewer pieces, to quickly test scenarios
     grid.each_with_index do |row,ridx|
       row.each_with_index do |_,cidx|
         self[[ridx,cidx]] = NullPiece.new(nil, self)
