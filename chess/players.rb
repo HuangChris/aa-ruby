@@ -25,6 +25,10 @@ class ComputerPlayer < Player
     @cursor_pos = nil
   end
 
+  #Right now, the computer will play a checkmate move if one is available (usually?)
+  #then play a random valid move otherwise.
+  #to add: take free pieces, evaluate possible trades and take advantageous ones.
+  #other strategies: move pieces closer to center/ememy king ?
   def get_input(start_pos)
      sleep(0.15)
     # _ = gets.chomp
