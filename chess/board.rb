@@ -50,7 +50,7 @@ class Board
   end
 
   def move_piece(start_pos, end_pos, color)
-    if valid_move?(start_pos,end_pos, color)
+    if valid_move?(start_pos, end_pos, color)
       # puts "#{start_pos} move to #{end_pos}" TODO see below (move!)
       self[start_pos], self[end_pos] = NullPiece.new(nil, self), self[start_pos]
     end
@@ -72,12 +72,16 @@ class Board
 
   def find_king(color)
     grid.each_with_index do |row, ridx|
-      row.each_with_index do |square, sidx|
-        if square.color == color && square.class == King
+      row.each_with_index do |piece, sidx|
+          # p piece.color
+          # p piece.class
+          # puts "#{color.to_s} #{[ridx,sidx]}"
+        if piece.color == color && piece.class == King
           return [ridx, sidx]
         end
       end
     end
+    p grid
     raise "what? no #{color} king!"
   end
 

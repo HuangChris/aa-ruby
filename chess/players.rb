@@ -21,7 +21,7 @@ end
 
 class ComputerPlayer < Player
   def get_input(start_pos)
-    sleep(0.25)
+    #  sleep(0.13)
     if start_pos.nil? #first part of move (return start_pos)
       computers_move_list = Hash.new
 
@@ -30,13 +30,24 @@ class ComputerPlayer < Player
           computers_move_list[pos] = move
         end
       end
-      test_move = computers_move_list.keys.sample
+      return winning_move(computers_move_list)[0] if winning_move(computers_move_list)
+      computers_move_list.keys.sample
 
 
     else #return move_to position
-      computer_move_list = @board[start_pos].moves(start_pos,true)
-      # computer_move_list.select! {|move| @board.valid_move?(start_pos, move, color)}
-      test_to_move = computer_move_list.sample
+      computers_move_list = @board[start_pos].moves(start_pos,true)
+      return winning_move(computers_move_list)[1] if winning_move(computers_move_list)
+      computers_move_list.sample
     end
+  end
+
+  def winning_move(computers_move_list)
+    opposite = (color == :black ? :white : :black)
+    computers_move_list.each do |start_pos, end_pos|
+      test_board = @board.dup
+      test_board.move!(start_pos, end_pos)
+      return [start_pos,end_pos] if test_board.check_mate?(opposite)
+    end
+    nil
   end
 end
