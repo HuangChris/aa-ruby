@@ -23,9 +23,9 @@ class Player
     when :s
       :see
     when :r
-      print "How much? "
-      raise_value = gets.chomp.to_i
-      [:raise, raise_value]
+      # print "How much? "
+      # raise_value = gets.chomp.to_i
+      :raise
     end
   end
 

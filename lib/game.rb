@@ -4,7 +4,8 @@ require_relative 'player'
 class PokerGame
   def initialize
     @deck = Deck.new
-    @players = get_players
+    # @players = get_players
+    @players = Array.new(4) {Player.new("name")}
     @current_pot = 0
   end
 
@@ -31,6 +32,10 @@ class PokerGame
 
   def show_current_standings
     #display each player's pot
+    @players.each do |player|
+      puts "#{player.name}: $#{player.pot}"
+    end
+
   end
 
   def deal_deck
@@ -42,8 +47,12 @@ class PokerGame
   end
 
   def get_bets
-    @players.each do |player|
-      player.get_play
+    # @players.each do |player|
+    #   case player.get_play
+    #   when :see
+    #     @pot += 5
+    #
+
     end
   end
 
