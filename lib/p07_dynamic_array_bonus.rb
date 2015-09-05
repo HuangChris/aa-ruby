@@ -21,27 +21,34 @@ class StaticArray
 end
 
 class DynamicArray
-  attr_reader :count
+  attr_reader :count, :capacity
 
   def initialize(capacity = 8)
     @store = StaticArray.new(capacity)
     @count = 0
+    @capacity = capacity
   end
 
   def [](i)
+    @store[i]
   end
 
   def []=(i, val)
+    @store[i] = val
   end
 
-  def capacity
-    @store.length
-  end
+  # def capacity
+  #   # @store.length
+  # end
 
   def include?(val)
   end
 
   def push(val)
+    resize! if count == capacity
+
+    @store[count] = val
+    @count += 1
   end
 
   def unshift(val)

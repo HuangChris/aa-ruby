@@ -94,7 +94,7 @@ class ResizingIntSet
   end
 
   def resize!
-    new_store = Array.new(2*num_buckets) {Array.new }
+    new_store = Array.new(2 * num_buckets) { Array.new }
     @store.flatten.each do |el|
       new_store[el % new_store.length] << el
     end

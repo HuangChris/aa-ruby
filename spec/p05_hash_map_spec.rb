@@ -89,10 +89,9 @@ describe HashMap do
     end
 
     it "should re-hash items into its new store when resizing" do
-      6.times { |i| hash[i] = i + 1 }
       old_store = hash.instance_variable_get(:@store)
+      8.times { |i| hash[i] = i + 1 }
 
-      2.times { |i| hash[i + 6] = i + 7 }
       new_store = hash.instance_variable_get(:@store)
 
       expect(new_store).not_to eq(old_store)
